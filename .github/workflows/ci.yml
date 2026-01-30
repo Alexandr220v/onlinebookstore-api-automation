@@ -31,7 +31,11 @@ jobs:
 
       - name: Run Tests
         # We pass the suite variable here to ensure it uses your regression.xml
-        run: mvn clean test -Dsuite=regression || true
+        run: |
+          mvn dependency:get -Dartifact=org.aspectj:aspectjweaver:${{ env.ASPECTJ_VERSION }}:jar
+          mvn clean test -Dsuite=regression
+        env:
+          ASPECTJ_VERSION: 1.9.22.1
 
       - name: Generate Allure Report
         if: always()
