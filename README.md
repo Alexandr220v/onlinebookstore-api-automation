@@ -31,7 +31,7 @@ git clone https://github.com/Alexandr220v/onlinebookstore-api-automation.git
 
 Automated tests are configured to run in a GitHub Actions workflow. You can trigger the workflow manually from the "Actions" tab in your repository.
 
-1. You can trigger the workflow manually or view previous runs from the ["Run tests"](https://github.com/Alexandr220v/onlinebookstore-api-automation/blob/master/.github/workflows/ci.yml) in the Actions tab.
+1. You can trigger the workflow manually from [Action tab](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/ci.yml)
 2. Wait for [Report deploy](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/pages/pages-build-deployment/) job is completed (deployment of Allure report to GitHub Pages)
 3. [Open latest Allure report](https://Alexandr220v.github.io/onlinebookstore-api-automation/)
     https://github.com/Alexandr220v/onlinebookstore-api-automation
@@ -40,17 +40,18 @@ Automated tests are configured to run in a GitHub Actions workflow. You can trig
 
 1. **Install dependencies and run tests:**
 
+Single run
    ```bash
    mvn clean test -Dsuite=regression
    ```
-
+Parallel run
+   ```bash
+   mvn clean test -Dsuite=regression -Dthread.count=10
+   ```
 2. **View Allure Reports (optional):**
 
-   You can generate and open the test report:
+ You can generate and open the test report:
 
    ```bash
    mvn allure:report
    ```
-3. **Open report file**
-
-    - Open `target/site/allure-maven-plugin/index.html` in browser
