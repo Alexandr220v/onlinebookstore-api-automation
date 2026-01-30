@@ -21,7 +21,7 @@
         <log4j.version>2.25.2</log4j.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <allure-maven.version>2.16.1</allure-maven.version>
-        <aspectj.version>1.9.19</aspectj.version>
+        <aspectj.version>1.9.22.1</aspectj.version>
     </properties>
 
     <dependencies>
@@ -143,29 +143,48 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                    <configuration>
-                        <threadCount>${thread.count}</threadCount>
-                        <testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
 
-                        <suiteXmlFiles>
-                            <suiteXmlFile>src/main/resources/${suite}.xml</suiteXmlFile>
-                        </suiteXmlFiles>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <threadCount>${thread.count}</threadCount>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/main/resources/${suite}.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
 
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>${allure-maven.version}</version>
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
