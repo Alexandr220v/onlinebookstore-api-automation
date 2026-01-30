@@ -1,0 +1,53 @@
+name: Run Tests and Deploy Allure Report
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # Switched to Temurin (standard for CI)
+          java-version: '21'      # Must match your pom.xml version 65
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Run Tests
+        # We pass the suite variable here to ensure it uses your regression.xml
+        run: mvn clean test -Dsuite=regression || true
+
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          if [ -d target/allure-results ]; then
+            mvn allure:report
+          else
+            echo "Skipping report generation: no allure-results found. Check your AspectJ weaver config."
+            exit 1
+          fi
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./target/site/allure-maven-plugin
+          keep_files: false # Set to true if you want to keep history of old reports
