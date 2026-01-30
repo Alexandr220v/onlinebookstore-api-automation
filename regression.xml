@@ -1,0 +1,26 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Regression Suite" parallel="methods">
+
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+        <listener class-name="config.ThreadListener"/>
+    </listeners>
+
+    <groups>
+        <run>
+            <include name="regression"/>
+        </run>
+    </groups>
+
+    <test name="AuthorApiTests">
+        <packages>
+            <package name="tests.authors.*"/>
+        </packages>
+    </test>
+
+    <test name="BookApiTests">
+        <packages>
+            <package name="tests.books.*"/>
+        </packages>
+    </test>
+</suite>
