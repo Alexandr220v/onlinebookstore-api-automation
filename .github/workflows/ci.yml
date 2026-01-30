@@ -37,7 +37,7 @@ jobs:
         if: always()
         run: |
           if [ -d target/allure-results ]; then
-            mvn allure:report
+            mvn allure:serve
           else
             echo "Skipping report generation: no allure-results found. Check your AspectJ weaver config."
             exit 1
