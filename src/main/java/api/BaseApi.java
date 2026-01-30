@@ -2,6 +2,7 @@ package api;
 
 import config.BookStoreConfig;
 import config.LoggingFilter;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -20,6 +21,7 @@ public abstract class BaseApi {
         return new RequestSpecBuilder()
                 .setBaseUri(BookStoreConfig.instance.baseURI())
                 .setContentType(ContentType.JSON)
+                .addFilter(new AllureRestAssured())
                 .build();
     }
 
