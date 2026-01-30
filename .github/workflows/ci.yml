@@ -37,30 +37,27 @@ jobs:
           mvn clean test -Dsuite=regression
         continue-on-error: true # Ensures report is generated even if tests fail
 
-      - name: Load test report history
-        uses: actions/checkout@v3
+       - name: Show Test Output
         if: always()
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
+        run: |
+          echo "Contents of target/"
+          ls -la target
+          echo "Contents of target/allure-results/"
+          ls -la target/allure-results || echo "No allure-results found"
 
-      - name: Build test report
-        uses: simple-elf/allure-report-action@v1.7
-        if: always()
-        with:
-          gh_pages: gh-pages
-          allure_history: allure-history
-          allure_results: build/allure-results
+      - name: Generate Allure Report
+        if: success() || failure()
+        run: |
+          if [ -d target/allure-results ]; then
+            mvn allure:report
+          else
+            echo "Skipping report generation: no allure-results."
+          fi
 
-      - name: Publish test report
-        uses: peaceiris/actions-gh-pages@v3
-        if: always()
+      - name: Deploy to GitHub Pages
+        if: success() || failure()
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
-
-      - name: Print Allure Report URL
-        run: |
-          echo "Allure report is available at: https://github.com/Alexandr220v/onlinebookstore-api-automation/"
+          publish_dir: ./target/site/allure-maven-plugin
