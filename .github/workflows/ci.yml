@@ -59,4 +59,4 @@ jobs:
 
       - name: Print Allure Report URL
         run: |
-          echo "Allure report is available at: https://igtkachov.github.io/fake-rest-api-tests/"
+          echo "Allure report is available at: https://github.com/Alexandr220v/onlinebookstore-api-automation/"
