@@ -2,10 +2,9 @@
 <suite name="Regression Suite" parallel="methods">
 
     <listeners>
-        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNgTestFilter"/>
         <listener class-name="config.ThreadListener"/>
     </listeners>
-
     <groups>
         <run>
             <include name="regression"/>
