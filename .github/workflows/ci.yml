@@ -37,7 +37,7 @@ jobs:
           mvn clean test -Dsuite=regression
         continue-on-error: true # Ensures report is generated even if tests fail
 
-       - name: Show Test Output
+      - name: Show Test Output
         if: always()
         run: |
           echo "Contents of target/"
