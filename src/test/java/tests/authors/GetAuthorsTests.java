@@ -1,24 +1,21 @@
 package tests.authors;
 
-import api.AuthorsApi;
-import api.BooksApi;
-import com.google.inject.Inject;
-import config.ApiConfig;
+import assertion.Assertion;
+import dataprovider.AuthorDataProvider;
 import dto.Author;
-import dto.Book;
+import dto.ErrorResponse;
 import io.qameta.allure.Description;
 import org.assertj.core.api.Assertions;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 import tests.BaseTest;
 import utils.DataUtils;
-import utils.DateUtils;
 
 import java.util.List;
 
-import static dataprovider.AuthorDataProvider.FIRST_NAME;
-import static dataprovider.AuthorDataProvider.LAST_NAME;
+import static assertion.Assertion.NEW_AUTHOR_FIELDS_SHOULD_MATCH;
+import static dataprovider.AuthorDataProvider.DEFAULT_FIRST_NAME;
+import static dataprovider.AuthorDataProvider.DEFAULT_LAST_NAME;
+import static utils.DataUtils.uniqueId;
 
 
 public class GetAuthorsTests extends BaseTest {
@@ -27,39 +24,49 @@ public class GetAuthorsTests extends BaseTest {
     @Test(groups = "regression")
     @Description("Verify get author by id.")
     public void verifyGetAuthorById() {
-        int uniqueId = DataUtils.uniqueId();
-        Author expectedAuthor = Author.builder()
-                .id(uniqueId)
-                .idBook(DataUtils.uniqueId())
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .build();
+        int uniqueId = uniqueId();
+        Author expectedAuthor = new AuthorDataProvider().getBaseAuthor(uniqueId);
         Author newAuthorActual = authorsApi.createAuthor(expectedAuthor);
         Assertions.assertThat(newAuthorActual)
-                .as("New Author fields should match")
-                .usingRecursiveComparison()
+                .as(NEW_AUTHOR_FIELDS_SHOULD_MATCH)
                 .isEqualTo(expectedAuthor);
-        Author getAuthorActual = authorsApi.getAuthor(uniqueId);
+        Author getAuthorActual = authorsApi.getAuthor(uniqueId); // Possible  Bug or Demo Fake Api behaviour: Verify the author exists after created
         Assertions.assertThat(getAuthorActual)
-                .as("New Author fields should match")
+                .as(NEW_AUTHOR_FIELDS_SHOULD_MATCH)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedAuthor);
     }
 
     @Test(groups = "regression")
+    @Description("Verify get existing author by id.")
+    public void verifyGetExistingAuthorById() {
+        Author expectedAuthor = Author.builder()
+                .id(200)
+                .idBook(65)
+                .firstName("First Name 200")
+                .lastName("Last Name 200")
+                .build();
+        Author getAuthorActual = authorsApi.getAuthor(200);
+        Assertions.assertThat(getAuthorActual)
+                .as("Existing Author fields should match")
+                .isEqualTo(expectedAuthor);
+    }
+
+    @Test(groups = "regression")
+    @Description("Verify get non-existing author by id.")
+    public void verifyGetNonExistingAuthorById() {
+        ErrorResponse errorResponse = authorsApi.getAuthorError(1313);
+       assertion.validateNotFoundError(errorResponse);
+    }
+
+    @Test(groups = "regression")
     @Description("Verify author exists in authors list.")
     public void verifyGreatedAuthorExistsInAllAuthor() {
-        int uniqueId = DataUtils.uniqueId();
-        Author expectedAuthor = Author.builder()
-                .id(uniqueId)
-                .idBook(DataUtils.uniqueId())
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .build();
+        int uniqueId = uniqueId();
+        Author expectedAuthor = new AuthorDataProvider().getBaseAuthor(uniqueId);
         Author newAuthorActual = authorsApi.createAuthor(expectedAuthor);
         Assertions.assertThat(newAuthorActual)
-                .as("New Author fields should match")
-                .usingRecursiveComparison()
+                .as(NEW_AUTHOR_FIELDS_SHOULD_MATCH)
                 .isEqualTo(expectedAuthor);
         List<Author> authorsListActual = authorsApi.getAllAuthors();
         Author foundInList = authorsListActual.stream()
@@ -68,8 +75,27 @@ public class GetAuthorsTests extends BaseTest {
                 .orElseThrow(() -> new AssertionError("Author not found in list after creation"));
 
         Assertions.assertThat(foundInList)
-                .as("The author object inside the list should match exactly")
-                .usingRecursiveComparison()
+                .as("The author fields inside the list should be match.")
+                .isEqualTo(expectedAuthor);
+    }
+
+    @Test(groups = "regression")
+    @Description("Verify existing author is presented in authors list.")
+    public void verifyExistingAuthorExistsInAllAuthor() {
+        Author expectedAuthor = Author.builder()
+                .id(200)
+                .idBook(65)
+                .firstName("First Name 200")
+                .lastName("Last Name 200")
+                .build();
+        List<Author> authorsListActual = authorsApi.getAllAuthors();
+        Author foundInList = authorsListActual.stream()
+                .filter(a -> a.getId().equals(expectedAuthor.getId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Author not found in list after creation"));
+
+        Assertions.assertThat(foundInList)
+                .as("The author fields inside the list should be match.")
                 .isEqualTo(expectedAuthor);
     }
 

@@ -64,6 +64,11 @@ public class AuthorsApi  extends  BaseApi{
         return delete(String.format(AUTHOR_ID, id), HttpStatus.SC_OK);
     }
 
+    @Step("Delete author with ID: {id}")
+    public ErrorResponse deleteAuthorError(int id) {
+        return delete(String.format(AUTHOR_ID, id), HttpStatus.SC_BAD_REQUEST).as(ErrorResponse.class);
+    }
+
     public ResponseData updateAuthorError(Author author, int statusCode) {
         return put(String.format(AUTHOR_ID, author.getId()),author, statusCode);
     }

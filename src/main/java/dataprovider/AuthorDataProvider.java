@@ -1,42 +1,77 @@
 package dataprovider;
 
 import dto.Author;
-import dto.Book;
 import org.testng.annotations.DataProvider;
 import utils.DataUtils;
-import utils.DateUtils;
 
 import java.util.Random;
 
+import static utils.DataUtils.uniqueId;
+
 
 public class AuthorDataProvider {
-    public static final String FIRST_NAME = "Agata";
-    public static final String LAST_NAME = "Crysty";
+    public static final String DEFAULT_FIRST_NAME = "Agata";
+    public static final String DEFAULT_LAST_NAME = "Crysty";
     public static final int ID_BOOK = new Random().nextInt(1000);
 
+    public Author getBaseAuthor(int id) {
+        return Author.builder()
+                .id(id)
+                .idBook(id)
+                .firstName(DEFAULT_FIRST_NAME)
+                .lastName(DEFAULT_LAST_NAME)
+                .build();
+    }
 
     @DataProvider(name = "validAuthorData")
+
     public Object[][] validAuthorData() {
         return new Object[][]{
-                // Partial: Only names (assuming ID/idBook might be auto-generated or optional)
-                { Author.builder().firstName("Agata").lastName("Crysty").build() },
-                // Only First Name
-                { Author.builder().firstName("Agata").build() }
+                // Names are NULL
+                {Author.builder()
+                        .id(uniqueId())
+                        .idBook(uniqueId())
+                        .build()
+                },
+                // idBook is Negative (might be validation)
+                {Author.builder()
+                        .id(uniqueId())
+                        .idBook(-10)
+                        .firstName(DEFAULT_FIRST_NAME)
+                        .lastName(DEFAULT_LAST_NAME)
+                        .build()
+                },
+                // id is Negative (might be validation)
+                {Author.builder()
+                        .id(-10)
+                        .idBook(uniqueId())
+                        .firstName(DEFAULT_FIRST_NAME)
+                        .lastName(DEFAULT_LAST_NAME)
+                        .build()
+                },
         };
     }
 
     @DataProvider(name = "invalidAuthorData")
     public Object[][] invalidAuthorData() {
         return new Object[][]{
-                // 1. Negative ID
-                { Author.builder().id(-7857).firstName("Agata").lastName("Crysty").build(), "id" },
 
-                // 2. Null ID
-                { Author.builder().idBook(ID_BOOK).firstName("Agata").lastName("Crysty").build(), "id" },
+                // Id is  Null
+                {Author.builder()
+                        .idBook(ID_BOOK)
+                        .firstName(DEFAULT_FIRST_NAME)
+                        .lastName(DEFAULT_LAST_NAME)
+                        .build(),
+                        "id"},
 
-                // 3. Negative idBook
-                { Author.builder().id(7857).idBook(-6192).firstName("Agata").build(), "idBook" }
+                // 2. idBook is  Null
+                {Author.builder()
+                        .id(uniqueId())
+                        .firstName(DEFAULT_FIRST_NAME)
+                        .lastName(DEFAULT_LAST_NAME)
+                        .build()
+                        , "idBook"
+                },
         };
-        };
-
+    }
 }

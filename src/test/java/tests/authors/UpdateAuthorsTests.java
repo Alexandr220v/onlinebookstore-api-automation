@@ -1,99 +1,74 @@
 package tests.authors;
 
-import api.AuthorsApi;
-import api.BooksApi;
-import com.google.inject.Inject;
-import config.ApiConfig;
+import assertion.Assertion;
 import dataprovider.AuthorDataProvider;
 import dto.Author;
-import dto.Book;
 import dto.ErrorResponse;
 import io.qameta.allure.Description;
 import org.assertj.core.api.Assertions;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 import tests.BaseTest;
 import utils.DataUtils;
-import utils.DateUtils;
 
-import static dataprovider.AuthorDataProvider.FIRST_NAME;
-import static dataprovider.AuthorDataProvider.LAST_NAME;
-import static dataprovider.BookDataProvider.*;
-import static dataprovider.BookDataProvider.EXCERPT;
+import static assertion.Assertion.NEW_AUTHOR_FIELDS_SHOULD_MATCH;
+import static assertion.Assertion.UPDATED_AUTHOR_FIELDS_SHOULD_MATCH;
+import static dataprovider.AuthorDataProvider.DEFAULT_FIRST_NAME;
+import static dataprovider.AuthorDataProvider.DEFAULT_LAST_NAME;
+import static utils.DataUtils.uniqueId;
 
 
 public class UpdateAuthorsTests extends BaseTest {
 
 
     @Test(groups = "regression")
-    @Description("Verify updating author information.")
+    @Description("Verify author information can be updated.")
     public void verifyUpdateAuthor() {
-        int uniqueId = DataUtils.uniqueId();
-        Author expectedAuthor = Author.builder()
-                .id(uniqueId)
-                .idBook(DataUtils.uniqueId())
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .build();
+        int uniqueId = uniqueId();
+        Author expectedAuthor = new AuthorDataProvider().getBaseAuthor(uniqueId);
+
         Author newAuthorActual = authorsApi.createAuthor(expectedAuthor);
         Assertions.assertThat(newAuthorActual)
-                .as("New Author fields should match")
-                .usingRecursiveComparison()
+                .as(NEW_AUTHOR_FIELDS_SHOULD_MATCH)
                 .isEqualTo(expectedAuthor);
         Author updatedAuthorExpected =  Author.builder()
                 .id(uniqueId)
                 .idBook(DataUtils.uniqueId())
-                .firstName(FIRST_NAME + "Updated")
-                .lastName(LAST_NAME + "Updated")
+                .firstName(DEFAULT_FIRST_NAME + "Updated")
+                .lastName(DEFAULT_LAST_NAME + "Updated")
                 .build();
         Author updatedBookActual = authorsApi.updateAuthor(updatedAuthorExpected);
         Assertions.assertThat(updatedBookActual).as("Updated book fields should match").isEqualTo(updatedAuthorExpected);
     }
 
     @Test(groups = "regression", dataProvider = "validAuthorData" , dataProviderClass = AuthorDataProvider.class)
-    @Description("Verify updating author information partially.")
-    public void verifyCreateAuthorWithoutFullFields(Author validAuthor) {
-        int uniqueId = DataUtils.uniqueId();
-        Author expectedAuthor = Author.builder()
-                .id(uniqueId)
-                .idBook(DataUtils.uniqueId())
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .build();
+    @Description("Verify author information can be updated partially.")
+    public void verifyAuthorInformationCanBeUpdatedPartially(Author validAuthor) {
+        int uniqueId = uniqueId();
+        Author expectedAuthor = new AuthorDataProvider().getBaseAuthor(uniqueId);
+
         Author newAuthorActual = authorsApi.createAuthor(expectedAuthor);
         Assertions.assertThat(newAuthorActual)
-                .as("New Author fields should match")
-                .usingRecursiveComparison()
+                .as(NEW_AUTHOR_FIELDS_SHOULD_MATCH)
                 .isEqualTo(expectedAuthor);
+
         Author updatedAuthorActual = authorsApi.updateAuthor(validAuthor);
         Assertions.assertThat(updatedAuthorActual)
-                .as("New Author fields should match")
-                .usingRecursiveComparison()
+                .as(UPDATED_AUTHOR_FIELDS_SHOULD_MATCH)
                 .isEqualTo(validAuthor);
     }
 
     @Test(groups = "regression",dataProvider = "invalidAuthorData" , dataProviderClass = AuthorDataProvider.class)
-    @Description("Verify  author information cannot be updated.")
+    @Description("Verify author information cannot be updated.")
     public void verifyCreateInvalidAuthors(Author invalidAuthor, String expectedErrorKey) {
-        int uniqueId = DataUtils.uniqueId();
-        Author expectedAuthor = Author.builder()
-                .id(uniqueId)
-                .idBook(DataUtils.uniqueId())
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .build();
+        int uniqueId = uniqueId();
+        Author expectedAuthor = new AuthorDataProvider().getBaseAuthor(uniqueId);
+
         Author newAuthorActual = authorsApi.createAuthor(expectedAuthor);
         Assertions.assertThat(newAuthorActual)
-                .as("New Author fields should match")
-                .usingRecursiveComparison()
+                .as(NEW_AUTHOR_FIELDS_SHOULD_MATCH)
                 .isEqualTo(expectedAuthor);
 
         ErrorResponse errorResponse = authorsApi.updateAuthorError(invalidAuthor);
-        Assertions.assertThat(errorResponse.getTitle()).as("Error title")
-                .isEqualTo("One or more validation errors occurred.");
-        Assertions.assertThat(errorResponse.getErrors().keySet())
-                .as("Errors map should contain a key related to: " + expectedErrorKey)
-                .anyMatch(key -> key.contains(expectedErrorKey));
+        assertion.validateBadRequestError(expectedErrorKey, errorResponse);
     }
 }

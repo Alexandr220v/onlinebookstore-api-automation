@@ -15,7 +15,7 @@ public interface BookStoreConfig extends Config {
     String baseURI();
 
     @Key("thread.count")
-    @DefaultValue("3")
+    @DefaultValue("1")
     int threadCount();
 
 }

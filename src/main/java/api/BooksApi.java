@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import dto.Book;
 import dto.ErrorResponse;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class BooksApi extends BaseApi {
 
     @Step("Create book and expect error: {book}")
     public ErrorResponse createBookError(Book book) {
-        return post(BOOKS, new Gson().toJson(book), HttpStatus.SC_BAD_REQUEST).as(ErrorResponse.class);
+        return post(BOOKS, book, HttpStatus.SC_BAD_REQUEST).as(ErrorResponse.class);
     }
 
     @Step("Update book details for ID: {book.id}")
@@ -49,9 +51,10 @@ public class BooksApi extends BaseApi {
         return put(String.format(BOOK_ID, book.getId()), new Gson().toJson(book), HttpStatus.SC_BAD_REQUEST).as(ErrorResponse.class);
     }
 
+
     @Step("Delete book with ID: {id}")
-    public ResponseData deleteBook(int id) {
-        return delete(String.format(BOOK_ID, id), HttpStatus.SC_OK);
+    public ValidatableResponse deleteBook(int id) {
+        return delete(String.format(BOOK_ID, id), HttpStatus.SC_OK).asResponse();
     }
 
 }
