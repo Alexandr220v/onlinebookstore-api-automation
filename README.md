@@ -54,3 +54,5 @@ Parallel run
    ```bash
    mvn allure:report
    ```
+
+ **Bug were found during testing can be found in allure report**
