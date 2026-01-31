@@ -11,7 +11,7 @@ import static utils.DataUtils.uniqueId;
 
 public class AuthorDataProvider {
     public static final String DEFAULT_FIRST_NAME = "Agata";
-    public static final String DEFAULT_LAST_NAME = "Crysty";
+    public static final String DEFAULT_LAST_NAME = "Christie";
     public static final int ID_BOOK = new Random().nextInt(1000);
 
     public Author getBaseAuthor(int id) {
