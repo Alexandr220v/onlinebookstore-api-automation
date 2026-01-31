@@ -31,17 +31,17 @@ git clone https://github.com/Alexandr220v/onlinebookstore-api-automation.git
 
 Automated tests are configured to run in a GitHub Actions workflow. You can trigger the workflow manually from the "Actions" tab in your repository.
 
-1. You can trigger the workflow manually from [Action tab](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/ci.yml)
-2. Wait for [Report deploy](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/pages/pages-build-deployment/) job is completed (deployment of Allure report to GitHub Pages)
-3. [Open latest Allure report](https://Alexandr220v.github.io/onlinebookstore-api-automation/)
+1. Workflow can be triggered  from [Action tab](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/ci.yml)
+2. Wait for deployment  [Report deploy](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/pages/pages-build-deployment/) . (deployment of Allure report to GitHub Pages)
+3. [Open latest Allure report](https://Alexandr220v.github.io/onlinebookstore-api-automation/). Can take ~ 10 min to generate a new allure report after deployment. 
 
 ### Running Tests Locally
 
 1. **Install dependencies and run tests:**
 
-Single run
+Single run in one thread
    ```bash
-   mvn clean test -Dsuite=regression
+   mvn clean test -Dsuite=regression -Dthread.count=1
    ```
 Parallel run
    ```bash
