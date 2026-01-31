@@ -30,35 +30,34 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Run Tests
-        # We use continue-on-error: true so that a failed test doesn't stop the report generation
+        # 1. We download the weaver first so the -javaagent path is valid
+        # 2. We use -Dsuite=regression to match your pom.xml
         run: |
           mvn dependency:get -Dartifact=org.aspectj:aspectjweaver:1.9.22.1:jar
           mvn clean test -Dsuite=regression
-        continue-on-error: true
+        continue-on-error: true # Ensures report is generated even if tests fail
 
-      - name: Get Allure History
-        # This pulls the existing history from the gh-pages branch so the report shows trends
-        uses: actions/checkout@v4
+      - name: Show Test Output
         if: always()
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages-history
+        run: |
+          echo "Contents of target/"
+          ls -la target
+          echo "Contents of target/allure-results/"
+          ls -la target/allure-results || echo "No allure-results found"
 
-      - name: Generate Allure Report with History
-        # This action combines results with existing history
-        uses: simple-elf/allure-report-action@v1.9
-        if: always()
-        with:
-          allure_results: target/allure-results
-          allure_history: allure-history
-          keep_reports: 20
+      - name: Generate Allure Report
+        if: success() || failure()
+        run: |
+          if [ -d target/allure-results ]; then
+            mvn allure:report
+          else
+            echo "Skipping report generation: no allure-results."
+          fi
 
       - name: Deploy to GitHub Pages
-        # This pushes the generated 'allure-history' folder back to the gh-pages branch
-        if: always()
+        if: success() || failure()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: ./target/site/allure-maven-plugin
