@@ -34,7 +34,6 @@ Automated tests are configured to run in a GitHub Actions workflow. You can trig
 1. You can trigger the workflow manually from [Action tab](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/ci.yml)
 2. Wait for [Report deploy](https://github.com/Alexandr220v/onlinebookstore-api-automation/actions/workflows/pages/pages-build-deployment/) job is completed (deployment of Allure report to GitHub Pages)
 3. [Open latest Allure report](https://Alexandr220v.github.io/onlinebookstore-api-automation/)
-    https://github.com/Alexandr220v/onlinebookstore-api-automation
 
 ### Running Tests Locally
 
@@ -55,3 +54,5 @@ Parallel run
    ```bash
    mvn allure:report
    ```
+
+ **Bug were found during testing can be found in allure report**
