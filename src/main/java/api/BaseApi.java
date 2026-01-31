@@ -22,11 +22,8 @@ public abstract class BaseApi {
                 .setBaseUri(BookStoreConfig.instance.baseURI())
                 .setContentType(ContentType.JSON)
                 .addFilter(new AllureRestAssured())
+                .addFilter(new LoggingFilter())
                 .build();
-    }
-
-    static {
-        RestAssured.filters(new LoggingFilter());
     }
 
     private ValidatableResponse sendRequest(Method method, String endpoint, Map<String, String> queryParams, int expectedStatusCode
